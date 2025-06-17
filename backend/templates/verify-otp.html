@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đặt lại mật khẩu - S2 Code Shop</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      box-shadow: 0 0 10px #333;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: none;
+    }
+    input {
+      background: #2e2e2e;
+      color: #fff;
+    }
+    button {
+      background-color: #03DAC6;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .msg {
+      font-size: 0.9em;
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>Nhập mã OTP & mật khẩu mới</h3>
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="otp" placeholder="Mã xác minh OTP">
+    <input type="password" id="new_password" placeholder="Mật khẩu mới">
+    <button onclick="resetPassword()">Đặt lại mật khẩu</button>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <script>
+    async function resetPassword() {
+      const email = document.getElementById("email").value;
+      const otp = document.getElementById("otp").value;
+      const new_password = document.getElementById("new_password").value;
+      const msg = document.getElementById("msg");
+
+      try {
+        const res = await fetch("http://34.151.83.128:5000/api/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp, new_password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          msg.style.color = "lightgreen";
+          msg.textContent = "✅ " + data.message;
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 1500);
+        } else {
+          msg.style.color = "#ff6b6b";
+          msg.textContent = data.error || "Lỗi không xác định";
+        }
+      } catch (err) {
+        msg.textContent = "Không thể kết nối server.";
+      }
+    }
+  </script>
+</body>
+</html>

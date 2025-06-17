@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đơn hàng đã mua - S2 Code Shop</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #03dac6;
+    }
+    .order {
+      background: #1e1e1e;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    a {
+      color: #03dac6;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛒 Đơn hàng đã mua</h2>
+  <div id="orderList">Đang tải...</div>
+  <br />
+  <a href="/index">← Quay về trang chủ</a>
+
+  <script>
+    async function loadOrders() {
+      const token = localStorage.getItem("token");
+      if (!token) return location.href = "/login";
+
+      const res = await fetch("/api/orders", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+
+      const data = await res.json();
+      const list = document.getElementById("orderList");
+      list.innerHTML = "";
+
+      if (data.length === 0) {
+        list.innerHTML = "❗ Bạn chưa có đơn hàng nào.";
+        return;
+      }
+
+      data.forEach(o => {
+        const div = document.createElement("div");
+        div.className = "order";
+        div.innerText = `✅ ${o.name} - ${o.price} VNĐ`;
+        list.appendChild(div);
+      });
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>

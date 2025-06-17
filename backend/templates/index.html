@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>S2 Code Shop</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #03dac6;
+    }
+    .menu-btn {
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 20px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 999;
+    }
+    .dropdown a {
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      padding: 5px 0;
+    }
+    .container {
+      padding: 20px;
+    }
+    .balance {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #ccc;
+    }
+    .section {
+      margin-top: 40px;
+    }
+    .section h3 {
+      color: #03dac6;
+    }
+    .product, .order {
+      background: #1f1f1f;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .api-box {
+      background: #1f1f1f;
+      margin-top: 30px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      background: #2a2a2a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #03dac6;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">S2 Code Shop</div>
+    <div class="menu-btn" onclick="toggleMenu()">⋮</div>
+    <div class="dropdown" id="menu">
+      <a href="/login">Đăng xuất</a>
+      <a href="#">Đơn hàng</a>
+      <a href="#">Sản phẩm</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <h2>Xin chào, <span id="userEmail">...</span> 👋</h2>
+    <div class="balance">Số dư: <span id="balance">0</span> VNĐ</div>
+
+    <div class="section">
+      <h3>Sản phẩm</h3>
+      <div class="product" onclick="alert('Chuyển tới trang sản phẩm')">📦 ChatGPT API 100K</div>
+      <div class="product" onclick="alert('Chuyển tới trang sản phẩm')">📦 Proxy VIP 50K</div>
+    </div>
+
+    <div class="section">
+      <h3>Đơn hàng đã đặt</h3>
+      <div class="order">✅ Đơn #10001 - ChatGPT API</div>
+    </div>
+
+    <div class="section api-box">
+      <h3>API Key của bạn</h3>
+      <input id="apiKey" placeholder="Nhập API Key của bạn" />
+      <button onclick="updateApiKey()">Cập nhật</button>
+      <p id="statusMsg"></p>
+    </div>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+
+    async function loadProfile() {
+      const token = localStorage.getItem("token");
+      if (!token) return location.href = "/login";
+
+      const res = await fetch("http://YOUR_IP:5000/api/profile", {
+        method: "GET",
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById("userEmail").innerText = data.email;
+        document.getElementById("balance").innerText = data.balance;
+        document.getElementById("apiKey").value = data.api_key;
+      } else {
+        alert("Phiên đăng nhập hết hạn");
+        localStorage.removeItem("token");
+        location.href = "/login";
+      }
+    }
+
+    async function updateApiKey() {
+      const token = localStorage.getItem("token");
+      const key = document.getElementById("apiKey").value;
+      const res = await fetch("http://34.151.83.128:5000/api/update-api-key", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ api_key: key })
+      });
+      const data = await res.json();
+      document.getElementById("statusMsg").innerText = data.message || data.error;
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đăng nhập - S2 Code Shop</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #333;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: none;
+    }
+    input {
+      background: #2e2e2e;
+      color: #fff;
+    }
+    button {
+      background-color: #03DAC6;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .error {
+      color: #ff6b6b;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Đăng nhập</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="login()">Đăng nhập</button>
+    <p id="msg" class="error"></p>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("msg");
+
+      try {
+        const res = await fetch("http://34.151.83.128:5000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          msg.style.color = "lightgreen";
+          msg.textContent = "✅ Đăng nhập thành công! Đang chuyển trang...";
+          setTimeout(() => {
+            // ✨ Chuyển trang với hiệu ứng xoay
+            document.body.style.transition = "transform 1s ease-in-out";
+            document.body.style.transform = "rotateY(360deg)";
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1000);
+          }, 800);
+        } else {
+          msg.style.color = "#ff6b6b";
+          msg.textContent = data.error || "Lỗi không xác định";
+        }
+      } catch (err) {
+        msg.textContent = "❌ Không thể kết nối server";
+      }
+    }
+  </script>
+</body>
+</html>
